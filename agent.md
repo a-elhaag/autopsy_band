@@ -141,6 +141,70 @@ Input → 1.Annotator → 2.Verifier → 3.ConfidenceScorer ─┐
                                                           → 5.Apex → 6.HumanEscalation → Report
 ```
 
+## Failure Taxonomy (v1.0)
+
+17 failure modes across 5 categories, derived from real enterprise AI engagements.
+
+### Prompt & Framing
+| ID | Name |
+|----|------|
+| FM-01 | Context Gap |
+| FM-02 | God-Prompt Overload |
+| FM-03 | Sycophantic Feasibility |
+| FM-04 | Problem Framing Failure |
+
+### Spec & Planning
+| ID | Name |
+|----|------|
+| FM-05 | Missing Acceptance Criteria |
+| FM-06 | Uncontrolled Evolution |
+| FM-07 | Business Objective Misalignment |
+
+### Architecture & Design
+| ID | Name |
+|----|------|
+| FM-08 | Architecture-MVP Mismatch |
+| FM-09 | Model Capability Mismatch |
+| FM-10 | Integration Reality Gap |
+
+### Context & Execution
+| ID | Name |
+|----|------|
+| FM-11 | Context Collapse |
+| FM-12 | Hallucinated Assumptions |
+| FM-13 | No Verification Loop |
+| FM-14 | Evaluation Blindness |
+
+### Decision & Governance
+| ID | Name |
+|----|------|
+| FM-15 | No Decision Ownership |
+| FM-16 | False Confidence from Plausible Output |
+| FM-17 | Shadow Logic |
+
+### Null State
+| ID | Name | Note |
+|----|------|------|
+| FM-00 | Insufficient Data | Input lacks enough diagnostic signal. Returning FM-00 is a high-accuracy result, not a tool failure. The Judge is explicitly instructed to prefer FM-00 over hallucinating a finding. |
+
+---
+
+## Taxonomy Loading
+
+The taxonomy loads at server startup. Each agent receives only `{id, name, definition}` per failure mode — remediation text is stored separately and appended by FM-ID *after* classification. This keeps token cost low and separates diagnosis from prescription.
+
+---
+
+## Non-Goals
+
+These are deliberate constraints, not gaps:
+- Does not fix or rewrite code — diagnoses the upstream decision that caused the code to be wrong.
+- Does not process single sentences — context-free inputs return Inconclusive by design.
+- Does not connect to GitHub, Jira, or any external system — input is plain text only.
+- Does not retain input — backend is stateless, every session is independent.
+
+---
+
 ## Constraints
 - No agent receives raw chat history — only original input + prior agent's structured output.
 - No claim without verbatim quote (Agent 2 gate).
