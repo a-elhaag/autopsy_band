@@ -1,0 +1,7 @@
+{% if error %}
+  <div class="error">{{ error }}</div>
+{% else %}
+  <article class="autopsy">
+    {{ report_html | safe }}
+  </article>
+{% endif %}

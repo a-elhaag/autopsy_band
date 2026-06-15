@@ -1,0 +1,20 @@
+{
+  "FM-01": "Supply the missing context explicitly: domain facts, prior decisions, and hard constraints belong in the prompt or a referenced spec, not in the model's assumptions.",
+  "FM-02": "Decompose the request. Give the model one goal per pass with clear inputs and a single definition of done; chain passes rather than overloading one prompt.",
+  "FM-03": "Require the model to state feasibility and blockers before proposing a solution. Reward surfacing problems over agreeable confidence.",
+  "FM-04": "Re-derive the underlying need before solving. Confirm the problem statement maps to the real outcome the user wants.",
+  "FM-05": "Write explicit, checkable acceptance criteria up front. Every requirement should have a test or observable condition for 'done'.",
+  "FM-06": "Record requirement changes in a controlled log. Re-validate prior work whenever scope evolves so later work doesn't silently contradict it.",
+  "FM-07": "Tie each technical decision back to the stated business objective. Cut work that does not advance the real goal.",
+  "FM-08": "Match architecture to maturity. Build the simplest thing that satisfies the MVP; defer abstractions until a real requirement demands them.",
+  "FM-09": "Match the model to the task. Re-scope or change models when the task exceeds reliable capability; don't paper over it with prompt scaffolding.",
+  "FM-10": "Validate integrations against reality early. Confirm APIs, data, and behavior exist as assumed before designing on top of them.",
+  "FM-11": "Protect context across steps. Use explicit handoffs, memory, or compaction so relevant context survives long runs.",
+  "FM-12": "Ground every claim in a verbatim source. Reject output that rests on invented facts, APIs, or constraints.",
+  "FM-13": "Add a verification loop. Test or check output before acceptance so errors are caught at the source.",
+  "FM-14": "Define and run evaluations. Measure output quality against a baseline so regressions surface.",
+  "FM-15": "Assign decision ownership. A named human or role must own key trade-offs and review them.",
+  "FM-16": "Demand evidence before trust. Plausible output is not correct output; verify before accepting.",
+  "FM-17": "Surface hidden logic. Make all behavior-driving logic explicit and documented so the system matches its spec.",
+  "FM-00": "Provide more diagnostic signal: the prompt+output pair, the spec, or the code with enough context to reason about the failure."
+}

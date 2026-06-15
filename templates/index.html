@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<form hx-post="/diagnose" hx-target="#report" hx-swap="innerHTML"
+      hx-indicator="#spinner">
+  <label for="input_text">
+    Paste a prompt+output pair, a vague spec, or code + description
+    (max {{ max_chars }} chars):
+  </label>
+  <textarea id="input_text" name="input_text" rows="14"
+            maxlength="{{ max_chars }}"
+            placeholder="e.g. PROMPT: build me a CRM that does everything…&#10;OUTPUT: …"></textarea>
+  <div class="actions">
+    <button type="submit">Run autopsy</button>
+    <span id="spinner" class="htmx-indicator">Diagnosing…</span>
+  </div>
+</form>
+
+<section id="report" aria-live="polite"></section>
+{% endblock %}

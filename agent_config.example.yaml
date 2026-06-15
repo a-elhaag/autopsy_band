@@ -1,0 +1,28 @@
+# Band agent registration for the 6-agent council.
+# Register each agent on https://app.band.ai/agents as a "Remote Agent",
+# copy its UUID + API key here, then add all 6 as participants in one chat room.
+# Copy this file to agent_config.yaml (gitignored).
+
+annotator:
+  agent_id: "<annotator-uuid>"
+  api_key: "<annotator-api-key>"
+
+verifier:
+  agent_id: "<verifier-uuid>"
+  api_key: "<verifier-api-key>"
+
+scorer:
+  agent_id: "<scorer-uuid>"
+  api_key: "<scorer-api-key>"
+
+reconstructor:
+  agent_id: "<reconstructor-uuid>"
+  api_key: "<reconstructor-api-key>"
+
+apex:
+  agent_id: "<apex-uuid>"
+  api_key: "<apex-api-key>"
+
+escalation:
+  agent_id: "<escalation-uuid>"
+  api_key: "<escalation-api-key>"

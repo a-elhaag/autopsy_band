@@ -1,0 +1,43 @@
+{
+  "version": "1.0",
+  "categories": {
+    "FM-01": "Prompt & Framing",
+    "FM-02": "Prompt & Framing",
+    "FM-03": "Prompt & Framing",
+    "FM-04": "Prompt & Framing",
+    "FM-05": "Spec & Planning",
+    "FM-06": "Spec & Planning",
+    "FM-07": "Spec & Planning",
+    "FM-08": "Architecture & Design",
+    "FM-09": "Architecture & Design",
+    "FM-10": "Architecture & Design",
+    "FM-11": "Context & Execution",
+    "FM-12": "Context & Execution",
+    "FM-13": "Context & Execution",
+    "FM-14": "Context & Execution",
+    "FM-15": "Decision & Governance",
+    "FM-16": "Decision & Governance",
+    "FM-17": "Decision & Governance",
+    "FM-00": "Null State"
+  },
+  "modes": [
+    {"id": "FM-01", "name": "Context Gap", "definition": "The model lacked essential context (domain facts, prior decisions, constraints) needed to produce a correct result, and the gap was not supplied in the prompt."},
+    {"id": "FM-02", "name": "God-Prompt Overload", "definition": "A single prompt attempts to specify too many goals, constraints, or steps at once, exceeding what the model can reliably satisfy in one pass."},
+    {"id": "FM-03", "name": "Sycophantic Feasibility", "definition": "The model agreed that an infeasible or ill-posed request was achievable rather than surfacing the problem, producing confident but unworkable output."},
+    {"id": "FM-04", "name": "Problem Framing Failure", "definition": "The wrong problem was framed or solved: the request optimizes for a goal that does not match the actual underlying need."},
+    {"id": "FM-05", "name": "Missing Acceptance Criteria", "definition": "No explicit, checkable definition of done was provided, so correctness cannot be verified and scope drifts."},
+    {"id": "FM-06", "name": "Uncontrolled Evolution", "definition": "Requirements or scope changed across iterations without a controlled record, so later work contradicts or invalidates earlier work."},
+    {"id": "FM-07", "name": "Business Objective Misalignment", "definition": "The technical solution does not serve the stated business objective; effort is spent on work that does not advance the real goal."},
+    {"id": "FM-08", "name": "Architecture-MVP Mismatch", "definition": "The chosen architecture is mismatched to the maturity of the work: over- or under-engineered relative to what an MVP requires."},
+    {"id": "FM-09", "name": "Model Capability Mismatch", "definition": "The task exceeds (or badly underuses) the capabilities of the chosen model, so results are unreliable or wasteful."},
+    {"id": "FM-10", "name": "Integration Reality Gap", "definition": "The design assumes integrations, APIs, or data that do not exist or behave differently in reality, so the build cannot connect end to end."},
+    {"id": "FM-11", "name": "Context Collapse", "definition": "Relevant context was lost or truncated during execution (context window, summarization, handoffs), degrading later steps."},
+    {"id": "FM-12", "name": "Hallucinated Assumptions", "definition": "The output rests on invented facts, APIs, or constraints that were never given and are not true."},
+    {"id": "FM-13", "name": "No Verification Loop", "definition": "There is no mechanism to test or verify output before it is accepted, so errors propagate undetected."},
+    {"id": "FM-14", "name": "Evaluation Blindness", "definition": "Output quality is not measured against any evaluation, so regressions and failures go unnoticed."},
+    {"id": "FM-15", "name": "No Decision Ownership", "definition": "No human or role owns the key decisions, so trade-offs are made implicitly by the model and never reviewed."},
+    {"id": "FM-16", "name": "False Confidence from Plausible Output", "definition": "Plausible-looking output is trusted as correct without evidence, leading to acceptance of wrong results."},
+    {"id": "FM-17", "name": "Shadow Logic", "definition": "Hidden or undocumented logic drives behavior, so the system does something other than what the visible spec or code implies."},
+    {"id": "FM-00", "name": "Insufficient Data", "definition": "The input lacks enough diagnostic signal to identify a failure mode. Returning FM-00 is a high-accuracy result, not a tool failure; prefer it over hallucinating a finding."}
+  ]
+}
