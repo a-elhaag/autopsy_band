@@ -19,14 +19,19 @@ def send_message(
     chat_id: str,
     api_key: str,
     content: str,
-    mentions: list[str],
+    mentions: list[dict],
     metadata: dict | None = None,
     timeout: float = 30.0,
 ) -> None:
     """Post a message addressed to `mentions` into `chat_id`."""
     url = f"{_rest_base()}/api/v1/agent/chats/{chat_id}/messages"
-    body = {"content": content, "mentions": mentions, "metadata": metadata or {}}
-    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+    body = {
+        "message": {
+            "content": content, "mentions": mentions
+        }
+    }
+    print(f"Posting message to Band: {body}")
+    headers = {"X-API-Key": api_key, "Content-Type": "application/json"}
     with httpx.Client(timeout=timeout) as client:
         resp = client.post(url, json=body, headers=headers)
         resp.raise_for_status()
