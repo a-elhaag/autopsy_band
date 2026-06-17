@@ -64,8 +64,7 @@ class CouncilAdapter(SimpleAdapter[list]):
             chat_id=chat_id,
             api_key=self.api_key,
             content=f"@{mention} council handoff from {self.stage}",
-            mentions=[{"id": AGENT_CONFIG[f"{mention}".lower()]["agent_id"], "type": "agent"}],
-            metadata={"council_payload": updated},
+            mentions=[{"id": AGENT_CONFIG[mention.lower()]["agent_id"], "type": "agent"}],
         )
 
     # --- SDK-schema-coupled extraction (align to live thenvoi if needed) ---
