@@ -9,6 +9,7 @@ from __future__ import annotations
 import asyncio
 import uuid
 
+from app.band.agent_config import AGENT_CONFIG
 from ..config import settings
 from . import client, result_store
 from .stage_graph import CHAIN
@@ -22,13 +23,7 @@ def _submit(original_input: str) -> str:
         chat_id=settings.band_chat_id,
         api_key=settings.band_initiator_api_key,
         content=f"@{_FIRST} new autopsy request",
-        mentions=[f"@{_FIRST}"],
-        metadata={
-            "council_payload": {
-                "correlation_id": correlation_id,
-                "original_input": original_input,
-            }
-        },
+        mentions=[{"id": AGENT_CONFIG[_FIRST.lower()]["agent_id"], "type": "agent"}],
     )
     return correlation_id
 
