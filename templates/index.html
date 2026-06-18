@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<form hx-post="/diagnose" hx-target="#report" hx-swap="innerHTML"
-      hx-indicator="#spinner">
+<form id="diagnose-form">
   <label for="input_text">
     Paste a prompt+output pair, a vague spec, or code + description
     (max {{ max_chars }} chars):
@@ -10,10 +9,162 @@
             maxlength="{{ max_chars }}"
             placeholder="e.g. PROMPT: build me a CRM that does everything…&#10;OUTPUT: …"></textarea>
   <div class="actions">
-    <button type="submit">Run autopsy</button>
-    <span id="spinner" class="htmx-indicator">Diagnosing…</span>
+    <button type="submit" id="run-btn">Run autopsy</button>
   </div>
 </form>
 
+<section id="pipeline" aria-live="polite" hidden>
+  <div class="timeline" id="timeline"></div>
+</section>
+
 <section id="report" aria-live="polite"></section>
+
+<script>
+const STAGES = [
+  { id: "annotator",     label: "Annotator",     desc: "Classifying failure candidates" },
+  { id: "verifier",      label: "Verifier",       desc: "Grounding claims with quotes" },
+  { id: "scorer",        label: "Scorer",         desc: "Scoring confidence",  parallel: true },
+  { id: "reconstructor", label: "Reconstructor",  desc: "Rebuilding spec",     parallel: true },
+  { id: "apex",          label: "Apex",           desc: "Synthesizing verdict" },
+  { id: "escalation",    label: "Escalation",     desc: "Checking escalation severity" },
+];
+
+function buildTimeline() {
+  const tl = document.getElementById("timeline");
+  tl.innerHTML = "";
+  STAGES.forEach(s => {
+    const row = document.createElement("div");
+    row.className = "tl-row" + (s.parallel ? " tl-parallel" : "");
+    row.id = "tl-" + s.id;
+    row.innerHTML = `
+      <span class="tl-dot" id="dot-${s.id}"></span>
+      <div class="tl-body">
+        <div class="tl-head">
+          <span class="tl-name">${s.label}</span>
+          <span class="tl-desc" id="desc-${s.id}">${s.desc}</span>
+          <span class="tl-model" id="model-${s.id}"></span>
+          <span class="tl-ms" id="ms-${s.id}"></span>
+        </div>
+        <pre class="tl-stream" id="stream-${s.id}" hidden></pre>
+      </div>`;
+    tl.appendChild(row);
+  });
+}
+
+function stageStart(stage, label, model) {
+  const dot = document.getElementById("dot-" + stage);
+  if (dot) dot.className = "tl-dot tl-running";
+  const desc = document.getElementById("desc-" + stage);
+  if (desc && label) desc.textContent = label;
+  const m = document.getElementById("model-" + stage);
+  if (m && model) m.textContent = model;
+  document.getElementById("tl-" + stage)?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function appendToken(stage, text) {
+  const pre = document.getElementById("stream-" + stage);
+  if (!pre) return;
+  pre.hidden = false;
+  pre.textContent += text;
+}
+
+function stageDone(stage, ms, thinking) {
+  const dot = document.getElementById("dot-" + stage);
+  if (dot) dot.className = "tl-dot tl-done";
+  const msEl = document.getElementById("ms-" + stage);
+  if (msEl) msEl.textContent = ms < 1000 ? ms + "ms" : (ms/1000).toFixed(1) + "s";
+
+  // collapse stream into a details block
+  const pre = document.getElementById("stream-" + stage);
+  if (pre && pre.textContent) {
+    const rawText = pre.textContent;
+    pre.remove();
+    const details = document.createElement("details");
+    details.className = "tl-think";
+    const summary = document.createElement("summary");
+    summary.textContent = thinking ? "output · reasoning" : "output";
+    const outPre = document.createElement("pre");
+    outPre.className = "tl-think-text";
+    outPre.textContent = rawText;
+    details.appendChild(summary);
+    details.appendChild(outPre);
+    if (thinking) {
+      const thinkPre = document.createElement("pre");
+      thinkPre.className = "tl-think-text tl-think-reasoning";
+      thinkPre.textContent = thinking;
+      const thinkLabel = document.createElement("div");
+      thinkLabel.className = "tl-think-label";
+      thinkLabel.textContent = "reasoning";
+      details.appendChild(thinkLabel);
+      details.appendChild(thinkPre);
+    }
+    document.getElementById("tl-" + stage)?.querySelector(".tl-body")?.appendChild(details);
+  } else if (thinking) {
+    const row = document.getElementById("tl-" + stage);
+    if (row) {
+      const details = document.createElement("details");
+      details.className = "tl-think";
+      const summary = document.createElement("summary");
+      summary.textContent = "reasoning";
+      const thinkPre = document.createElement("pre");
+      thinkPre.className = "tl-think-text";
+      thinkPre.textContent = thinking;
+      details.appendChild(summary);
+      details.appendChild(thinkPre);
+      row.querySelector(".tl-body")?.appendChild(details);
+    }
+  }
+}
+
+document.getElementById("diagnose-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const text = document.getElementById("input_text").value.trim();
+  if (!text) return;
+
+  document.getElementById("run-btn").disabled = true;
+  document.getElementById("report").innerHTML = "";
+  document.getElementById("pipeline").hidden = false;
+  buildTimeline();
+
+  const body = new URLSearchParams({ input_text: text });
+  const resp = await fetch("/diagnose/stream", { method: "POST", body });
+  const reader = resp.body.getReader();
+  const dec = new TextDecoder();
+  let buf = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, { stream: true });
+    const parts = buf.split("\n\n");
+    buf = parts.pop();
+    for (const part of parts) {
+      const line = part.trim();
+      if (!line.startsWith("data:")) continue;
+      let evt;
+      try { evt = JSON.parse(line.slice(5).trim()); } catch { continue; }
+
+      if (evt.type === "stage_start") {
+        stageStart(evt.stage, evt.label, evt.model);
+      } else if (evt.type === "token") {
+        appendToken(evt.stage, evt.text);
+      } else if (evt.type === "stage_done") {
+        stageDone(evt.stage, evt.ms, evt.thinking);
+      } else if (evt.type === "report") {
+        document.getElementById("pipeline").hidden = true;
+        document.getElementById("report").innerHTML = evt.html;
+        document.getElementById("report").scrollIntoView({ behavior: "smooth" });
+      } else if (evt.type === "error") {
+        document.getElementById("pipeline").hidden = true;
+        const div = document.createElement("div");
+        div.className = "error";
+        div.textContent = "Diagnosis failed: " + evt.message;
+        document.getElementById("report").replaceChildren(div);
+      }
+    }
+  }
+
+  document.getElementById("run-btn").disabled = false;
+});
+</script>
 {% endblock %}

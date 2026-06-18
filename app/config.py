@@ -13,12 +13,12 @@ class Settings(BaseSettings):
     app_url: str = "http://localhost:8000"
     app_name: str = "Autopsy Band"
 
-    model_annotator: str = "anthropic/claude-3.5-sonnet"
-    model_verifier: str = "anthropic/claude-3.5-sonnet"
-    model_scorer: str = "anthropic/claude-3.5-sonnet"
-    model_reconstructor: str = "anthropic/claude-3.5-sonnet"
-    model_apex: str = "anthropic/claude-3.5-sonnet"
-    model_escalation: str = "anthropic/claude-3.5-sonnet"
+    model_annotator: str = "nex-agi/nex-n2-pro:free"   # broad classify, agentic MoE (verified)
+    model_verifier: str = "openai/gpt-oss-120b"         # precision, verified strong
+    model_scorer: str = "openai/gpt-oss-20b"            # fast structured JSON (verified)
+    model_reconstructor: str = "openai/gpt-oss-120b"    # spec writing, strong (verified)
+    model_apex: str = "openai/gpt-oss-120b"             # synthesis, verified strong
+    model_escalation: str = "openai/gpt-oss-20b"        # binary decision, fast (verified)
 
     max_input_chars: int = 5000
 

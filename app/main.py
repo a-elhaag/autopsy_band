@@ -4,7 +4,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from fastapi import FastAPI, Form, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -80,6 +80,24 @@ async def _dispatch(input_text: str) -> dict:
         if report is not None:
             return report
     return await orchestrator.run(input_text)
+
+
+@app.post("/diagnose/stream")
+async def diagnose_stream(input_text: str = Form("")) -> StreamingResponse:
+    input_text = (input_text or "").strip()
+
+    async def generate():
+        import json
+        if not input_text:
+            yield f"data: {json.dumps({'type': 'error', 'message': 'Provide an input to diagnose.'})}\n\n"
+            return
+        async for chunk in orchestrator.stream(input_text):
+            yield chunk
+
+    return StreamingResponse(generate(), media_type="text/event-stream", headers={
+        "Cache-Control": "no-cache",
+        "X-Accel-Buffering": "no",
+    })
 
 
 @app.get("/healthz")
