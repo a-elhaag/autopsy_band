@@ -38,6 +38,7 @@ class CouncilAdapter(SimpleAdapter[list]):
         *,
         is_session_bootstrap: bool,
         room_id: str,
+        **kwargs
     ) -> None:
         if is_session_bootstrap:
             return
@@ -63,7 +64,7 @@ class CouncilAdapter(SimpleAdapter[list]):
         client.send_message(
             chat_id=chat_id,
             api_key=self.api_key,
-            content=f"@{mention} council handoff from {self.stage}",
+            content=f"council handoff from {self.stage}",
             mentions=[{"id": AGENT_CONFIG[mention.lower()]["agent_id"], "type": "agent"}],
         )
 
