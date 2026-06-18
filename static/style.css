@@ -230,13 +230,12 @@ footer { color: var(--muted); font-size: .85rem; }
   border: 1px solid var(--line);
   border-radius: 6px;
   font-size: .72rem;
-  line-height: 1.5;
+  line-height: 1.6;
   color: #7a9bbf;
   font-family: ui-monospace, monospace;
   white-space: pre-wrap;
-  word-break: break-all;
-  max-height: 140px;
-  overflow-y: auto;
+  word-break: break-word;
+  overflow: hidden;
   animation: fadeIn .15s ease;
 }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

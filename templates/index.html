@@ -66,8 +66,6 @@ function appendToken(stage, text) {
   if (!pre) return;
   pre.hidden = false;
   pre.textContent += text;
-  // auto-scroll to bottom of stream box
-  pre.scrollTop = pre.scrollHeight;
 }
 
 function stageDone(stage, ms, thinking) {
