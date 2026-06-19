@@ -2,7 +2,7 @@
 name = "autopsy-band"
 version = "0.1.0"
 description = "Forensic 6-agent council that diagnoses why an AI build failed"
-readme = "agent.md"
+readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.115",
