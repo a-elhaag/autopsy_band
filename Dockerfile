@@ -11,7 +11,6 @@ RUN uv sync --no-dev --frozen
 COPY app/ ./app/
 COPY templates/ ./templates/
 COPY static/ ./static/
-COPY agent_config.yaml ./agent_config.yaml
 
 EXPOSE 8000
 
